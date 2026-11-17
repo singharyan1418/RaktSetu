@@ -1,0 +1,189 @@
+{
+  "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Private RaktSetu member profile and active donor/recipient role.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "role": {
+          "type": "string",
+          "enum": ["donor", "recipient"]
+        },
+        "bloodType": {
+          "type": "string",
+          "enum": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"]
+        },
+        "neighborhood": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "avatarUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "displayName", "role", "bloodType", "neighborhood", "createdAt", "updatedAt"]
+    },
+    "ScreeningRecord": {
+      "title": "ScreeningRecord",
+      "description": "Preliminary medical screening submission owned by a member.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bloodType": {
+          "type": "string",
+          "enum": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"]
+        },
+        "neighborhood": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "availabilityWindow": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "enum": ["eligible", "temporary_deferral", "consult_center"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "bloodType", "neighborhood", "availabilityWindow", "status", "summary", "createdAt"]
+    },
+    "DonorProfile": {
+      "title": "DonorProfile",
+      "description": "Anonymized, privacy-blurred blood donor listing.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "anonymousHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "bloodType": {
+          "type": "string",
+          "enum": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"]
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        },
+        "privacyRadiusMeters": {
+          "type": "number"
+        },
+        "neighborhood": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "availabilityWindow": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "screeningStatus": {
+          "type": "string",
+          "enum": ["verified", "pending", "deferred"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerUid", "anonymousHandle", "bloodType", "lat", "lng", "privacyRadiusMeters", "neighborhood", "availabilityWindow", "screeningStatus", "createdAt"]
+    },
+    "HealthChatEntry": {
+      "title": "HealthChatEntry",
+      "description": "Private AI Health Assistant chat message.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "assistant"]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "role", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserAccount" },
+      "description": "Private user account documents strictly accessible only by the owning authenticated user."
+    },
+    "/users/{userId}/screenings/{screeningId}": {
+      "schema": { "$ref": "#/entities/ScreeningRecord" },
+      "description": "User medical screening submissions stored privately under the user."
+    },
+    "/users/{userId}/healthChats/{messageId}": {
+      "schema": { "$ref": "#/entities/HealthChatEntry" },
+      "description": "User AI health chat entries stored privately under the user."
+    },
+    "/donors/{donorId}": {
+      "schema": { "$ref": "#/entities/DonorProfile" },
+      "description": "Anonymized donor pins with privacy-blurred coordinates."
+    }
+  }
+}
